@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/YOUR-USERNAME/e-shop.git'
+                git branch: 'main', url: 'https://github.com/sayeem9090/e-shop.git'
             }
         }
         stage('Build Image') {
