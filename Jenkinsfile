@@ -8,17 +8,16 @@ pipeline {
             }
         }
 
-        stage('Login to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-creds', 
-                    usernameVariable: 'DOCKER_USER', 
-                    passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
-                }
-            }
+      stage('Login to DockerHub') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-creds',   // <-- correct ID from your Jenkins
+            usernameVariable: 'DOCKER_USER', 
+            passwordVariable: 'DOCKER_PASS')]) {
+            sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
         }
-
+    }
+}
         stage('Build Image') {
             steps {
                 sh 'docker build -t sayeem9090/eshop-frontend:latest ./frontend'
