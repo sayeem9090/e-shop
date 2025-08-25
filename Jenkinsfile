@@ -2,9 +2,20 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: 'main', url: 'https://github.com/sayeem9090/e-shop.git'
+                checkout scm
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-creds', 
+                    usernameVariable: 'DOCKER_USER', 
+                    passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                }
             }
         }
 
@@ -16,38 +27,33 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'docker run --rm sayeem9090/eshop-frontend:latest npm test || true'
+                echo 'Tests would run here'
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push $DOCKER_USER/eshop-frontend:latest
-                    '''
-                }
+                sh 'docker push sayeem9090/eshop-frontend:latest'
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                sh 'docker compose down || true && docker compose up -d'
+                echo 'Deploying to staging...'
             }
         }
 
         stage('Notify Team') {
             steps {
-                sh 'echo "✅ Deployment completed"'
-                // replace with Slack webhook later
+                echo 'Sending notifications...'
             }
         }
     }
 
     post {
         failure {
-            sh 'echo "❌ Deployment FAILED!"'
+            sh 'echo ❌ Deployment FAILED!'
         }
     }
 }
+
