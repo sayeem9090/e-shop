@@ -1,18 +1,40 @@
-version: '3'
+version: "3.9"
 services:
   frontend:
-    image: sayeem9090/eshop-frontend:latest
     build: ./frontend
+    container_name: eshop-frontend
     ports:
       - "3000:3000"
+    environment:
+      BACKEND_URL: "http://backend:5000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: eshop-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URL=mongodb://eshop:secret@mongo:27017/eshop?authSource=admin
     depends_on:
       - mongo
+    restart: unless-stopped
+
   mongo:
-    image: mongo:latest
+    image: mongo:6
+    container_name: eshop-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: eshop
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: eshop
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo_data:/data/db
 
 volumes:
-  mongo-data:
+  mongo_data:
+

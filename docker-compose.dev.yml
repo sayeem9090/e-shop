@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  eshop-mongo:
+    image: mongo:6
+    container_name: eshop-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  eshop-backend:
+    build: ./backend
+    container_name: eshop-backend
+    environment:
+      - MONGO_URL=mongodb://eshop-mongo:27017/eshop
+    ports:
+      - "5000:5000"
+    depends_on:
+      - eshop-mongo
+
+  eshop-frontend:
+    build: ./frontend
+    container_name: eshop-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - eshop-backend
+
+volumes:
+  mongo-data:
+
